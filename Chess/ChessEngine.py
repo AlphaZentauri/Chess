@@ -18,11 +18,11 @@ class GameState():
             ["__", "__", "__", "__", "__", "__", "__", "__"],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]]
-        self.moveFunctions = {'p': self.getPawnMoves, 'R': self.getRookMoves, 'N': self.getKnightMoves,
-                              'B': self.getBishopMoves, 'Q': self.getQueenMoves, 'K': self.getKingMoves, }
+        self.moveFunctions = {"p": self.getPawnMoves, "R": self.getRookMoves, "N": self.getKnightMoves,
+                              "B": self.getBishopMoves, "Q": self.getQueenMoves, "K": self.getKingMoves, }
 
-        self.whiteToMove = True
         self.moveLog = []
+        self.whiteToMove = True
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
         self.inCheck = False
@@ -36,12 +36,12 @@ class GameState():
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "__"
         self.board[move.endRow][move.endCol] = move.pieceMoved
-        self.moveLog.append(move)  # log the move so we can undo it later
+        self.moveLog.append(move)  # log move
         self.whiteToMove = not self.whiteToMove  # swap players
         # update the king's position
-        if move.pieceMoved == 'wK':
+        if move.pieceMoved == "wK":
             self.whiteKingLocation = (move.endRow, move.endCol)
-        elif move.pieceMoved == 'bK':
+        elif move.pieceMoved == "bK":
             self.blackKingLocation = (move.endRow, move.endCol)
 
     '''
@@ -50,13 +50,13 @@ class GameState():
     def undoMove(self):
         if len(self.moveLog) != 0:  # make sure that there is a move to undo
             move = self.moveLog.pop()
-            self.board[move.startRow][move.startCol] = move.pieceMoved
-            self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.board[move.startRow][move.startCol] = move.pieceMoved  # put piece on starting square
+            self.board[move.endRow][move.endCol] = move.pieceCaptured  # put back captured piece
             self.whiteToMove = not self.whiteToMove  # switch turns back
             # update the king's position
-            if move.pieceMoved == 'wK':
+            if move.pieceMoved == "wK":
                 self.whiteKingLocation = (move.startRow, move.startCol)
-            elif move.pieceMoved == 'bK':
+            elif move.pieceMoved == "bK":
                 self.blackKingLocation = (move.startRow, move.startCol)
 
     '''
@@ -81,7 +81,7 @@ class GameState():
                 pieceChecking = self.board[checkRow][checkCol]  # enemy piece causing check
                 validSquares = []  # squares that pieces can move to
                 # if knight, must capture knight or move king, other pieces can be blocked
-                if pieceChecking[1] == "N":
+                if pieceChecking[1] == 'N':
                     validSquares = [(checkRow, checkCol)]
                 else:
                     for i in range(1, 8):
@@ -147,20 +147,20 @@ class GameState():
 
         # black pawn moves
         else:
-            if self.board[r + 1][c] == "__":  # 1 square pawn advance
+            if self.board[r+1][c] == "__":  # 1 square pawn advance
                 if not piecePinned or pinDirection == (1, 0):
-                    moves.append(Move((r, c), (r + 1, c), self.board))
-                    if r == 1 and self.board[r + 2][c] == "__":  # 2 square pawn advance
-                        moves.append(Move((r, c), (r + 2, c), self.board))
+                    moves.append(Move((r, c), (r+1, c), self.board))
+                    if r == 1 and self.board[r+2][c] == "__":  # 2 square pawn advance
+                        moves.append(Move((r, c), (r+2, c), self.board))
             # captures
-            if c - 1 >= 0:  # captures to the left
-                if self.board[r + 1][c - 1][0] == 'w':  # white piece to capture
+            if c-1 >= 0:  # captures to the left
+                if self.board[r+1][c-1][0] == 'w':  # white piece to capture
                     if not piecePinned or pinDirection == (1, -1):
-                        moves.append(Move((r, c), (r + 1, c - 1), self.board))
-            if c + 1 <= 7:  # captures to the right
-                if self.board[r + 1][c + 1][0] == 'w':  # white piece to capture
+                        moves.append(Move((r, c), (r+1, c-1), self.board))
+            if c+1 <= 7:  # captures to the right
+                if self.board[r+1][c+1][0] == 'w':  # white piece to capture
                     if not piecePinned or pinDirection == (1, 1):
-                        moves.append(Move((r, c), (r + 1, c + 1), self.board))
+                        moves.append(Move((r, c), (r+1, c+1), self.board))
 
         # add pawn promotion later
 
@@ -227,7 +227,7 @@ class GameState():
             if self.pins[i][0] == r and self.pins[i][1] == c:
                 piecePinned = True
                 pinDirection = (self.pins[i][2], self.pins[i][3])
-                self.pins.remove(self.pins[3])
+                self.pins.remove(self.pins[i])                              # huge pin mistake, instead of [3] -> [i]!!!
                 break
         directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))
         enemyColor = "b" if self.whiteToMove else "w"
